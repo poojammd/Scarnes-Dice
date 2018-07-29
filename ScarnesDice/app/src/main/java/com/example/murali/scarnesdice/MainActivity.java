@@ -1,9 +1,13 @@
 package com.example.murali.scarnesdice;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private int userTurnScore = 0;
     private int computerOverallScore = 0;
     private int computerTurnScore = 0;
+
 
     TextView score;
     ImageView facenumber;
@@ -82,7 +87,14 @@ public class MainActivity extends AppCompatActivity {
                 userTurnScore=0;
                 score.setText("Your Score : "+userOverallScore+"  Computer Score : "+computerOverallScore+
                         "\nYour Current Score : "+userTurnScore+" Computer Current Score : "+computerTurnScore);
-                computerTurn();
+                if(userOverallScore>=100) {
+
+                    Toast.makeText(MainActivity.this, "The Player is the Winner\n", Toast.LENGTH_SHORT).show();
+                   dialogbox();
+
+                }
+                else
+                    computerTurn();
                             }
         });
     }
@@ -102,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
                 computerTurnScore+=n;
                 score.setText("Your Score : "+userOverallScore+"  Computer Score : "+computerOverallScore+
                         "\nYour Current Score : "+userTurnScore+" Computer Current Score : "+computerTurnScore);
+
+
             }
             else
             {
@@ -111,15 +125,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             m =r.nextInt(2);
-            if(m==1)
-            {
+            if(m==1) {
                 Toast.makeText(this, "Computer is Holding", Toast.LENGTH_SHORT).show();
-                computerOverallScore+=computerTurnScore;
-                computerTurnScore=0;
-                score.setText("Your Score : "+userOverallScore+"  Computer Score : "+computerOverallScore+
-                        "\nYour Current Score : "+userTurnScore+" Computer Current Score : "+computerTurnScore);
+                computerOverallScore += computerTurnScore;
+
+                computerTurnScore = 0;
+                score.setText("Your Score : " + userOverallScore + "  Computer Score : " + computerOverallScore +
+                        "\nYour Current Score : " + userTurnScore + " Computer Current Score : " + computerTurnScore);
+                if (computerOverallScore >= 100) {
+                    Toast.makeText(this, "Player loses", Toast.LENGTH_SHORT).show();
+                    dialogbox();
+                }
                 break;
             }
+
             else
             {
                 Log.d(LOG_TAG,"Computer Didnt Hold");
@@ -154,5 +173,44 @@ public class MainActivity extends AppCompatActivity {
             case 6 : facenumber.setImageResource(R.drawable.dice6); break;
 
         }
+    }
+    private void dialogbox()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                new ContextThemeWrapper(MainActivity.this, R.style.AlertDialogCustom));
+        builder.setCancelable(true);
+        builder.setTitle("New Game");
+        builder.setMessage("Would you like to start new game? ");
+        builder.setPositiveButton("YES",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        userOverallScore = 0;
+                        userTurnScore = 0;
+                        computerOverallScore = 0;
+                        computerTurnScore = 0;
+                        score.setText("Your Score : "+userOverallScore+"  Computer Score : "+computerOverallScore+
+                                "\nYour Current Score : "+userTurnScore+" Computer Current Score : "+computerTurnScore);
+
+
+
+
+                    }
+                });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Toast.makeText(MainActivity.this, "Exiting App", Toast.LENGTH_SHORT).show();
+                moveTaskToBack(true);
+                android.os.Process.killProcess(android.os.Process.myPid());
+                System.exit(1);
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+
     }
 }
